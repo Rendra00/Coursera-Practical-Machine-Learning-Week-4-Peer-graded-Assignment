@@ -1,0 +1,74 @@
+
+---
+title: "Practical Machine Learning Course Project"
+author: "Your Name"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+This report is created for the Coursera Practical Machine Learning course project. The objective is to predict the manner in which participants performed barbell lifts using sensor data from accelerometers placed on various parts of the body.
+
+## Data Loading
+
+```{r}
+library(caret)
+library(randomForest)
+
+# Load data
+training <- read.csv("pml-training.csv", na.strings = c("NA", "", "#DIV/0!"))
+testing <- read.csv("pml-testing.csv", na.strings = c("NA", "", "#DIV/0!"))
+```
+
+## Data Cleaning
+
+```{r}
+# Remove near-zero variance variables and those with too many missing values
+training <- training[, colSums(is.na(training)) < 0.9 * nrow(training)]
+
+# Remove non-predictive variables
+drops <- c("X", "user_name", "raw_timestamp_part_1", "raw_timestamp_part_2", 
+           "cvtd_timestamp", "new_window", "num_window")
+training <- training[, !(names(training) %in% drops)]
+
+# Remove columns with NAs
+training <- training[, colSums(is.na(training)) == 0]
+
+# Keep only common columns in test and train
+testing <- testing[, names(testing) %in% names(training)]
+
+# Add back the target variable
+classe <- training$classe
+training <- training[, names(training) != "classe"]
+```
+
+## Model Building
+
+```{r}
+set.seed(123)
+rf_model <- randomForest(training, y = classe, ntree = 100)
+```
+
+## Cross-Validation Accuracy
+
+```{r}
+set.seed(123)
+control <- trainControl(method="cv", number=5)
+model_cv <- train(training, classe, method="rf", trControl=control)
+model_cv$results
+```
+
+## Predictions on Test Set
+
+```{r}
+predictions <- predict(rf_model, newdata = testing)
+predictions
+```
+
+## Conclusion
+
+The Random Forest model achieved high accuracy through 5-fold cross-validation. It was used to predict the manner in which participants performed the exercise in the 20 test cases.

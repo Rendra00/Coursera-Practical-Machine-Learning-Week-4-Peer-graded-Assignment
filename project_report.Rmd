@@ -1,7 +1,6 @@
-
 ---
 title: "Practical Machine Learning Course Project"
-author: "Your Name"
+author: "Dwi Rendra Hadi"
 output: html_document
 ---
 

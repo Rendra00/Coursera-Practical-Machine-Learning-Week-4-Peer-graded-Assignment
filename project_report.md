@@ -1,4 +1,4 @@
-# Predict activity quality from activity monitors
+# Predict activity quality
 Dwi Rendra Hadi  
 11. May 2025  
 
